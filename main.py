@@ -74,8 +74,7 @@ def get_hadith():
 <b>Terjemahan:</b>
 {data["data"]["contents"]["id"]}
 
-<b>Support kami di sini:</b>
-<a href="https://linktr.ee/shariputdin">Klik di sini</a>
+<b>Support kami dengan sebarkan hadist dan channel ini:</b>
 """
             send_to_telegram(message, BOT_TOKEN, CHAT_ID)
 
