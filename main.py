@@ -74,7 +74,7 @@ def get_hadith():
 <b>Terjemahan:</b>
 {data["data"]["contents"]["id"]}
 
-<b>Support kami dengan sebarkan hadist dan channel ini:</b>
+<b>Support kami dengan sebarkan hadist & channel ini:</b>
 """
             send_to_telegram(message, BOT_TOKEN, CHAT_ID)
 
