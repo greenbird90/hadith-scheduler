@@ -23,8 +23,22 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      # 🔽 Mengunduh last_id.json dari artifacts sebelumnya (jika ada)
+      - name: Restore last_id.json
+        uses: actions/download-artifact@v3
+        with:
+          name: last_id
+        continue-on-error: true  # Menghindari error jika artifact belum pernah dibuat
+
       - name: Run script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
+
+      # 🔼 Menyimpan last_id.json sebagai artifact setelah skrip berjalan
+      - name: Save last_id.json
+        uses: actions/upload-artifact@v3
+        with:
+          name: last_id
+          path: last_id.json
