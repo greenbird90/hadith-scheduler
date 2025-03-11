@@ -2,9 +2,9 @@ name: Run Telegram Hadith Bot
 
 on:
   schedule:
-    - cron: "30 12 * * *"  # Jam 12:30 UTC (sesuaikan jika perlu)
-    - cron: "0 18 * * *"   # Jam 18:00 UTC
-    - cron: "0 4 * * *"    # Jam 04:00 UTC
+    - cron: "30 5 * * *"   # 12:30 WIB
+    - cron: "0 11 * * *"   # 18:00 WIB
+    - cron: "0 21 * * *"   # 04:00 WIB
   workflow_dispatch:  # Memungkinkan menjalankan manual dari GitHub Actions
 
 jobs:
