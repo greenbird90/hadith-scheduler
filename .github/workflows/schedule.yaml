@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "30 5 * * *"   # 12:30 WIB
     - cron: "0 11 * * *"   # 18:00 WIB
-    - cron: "0 21 * * *"   # 04:00 WIB
+    - cron: "21 21 * * *"  # 04:00 WIB
   workflow_dispatch:  # Memungkinkan menjalankan manual dari GitHub Actions
 
 jobs:
