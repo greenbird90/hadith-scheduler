@@ -38,7 +38,7 @@ jobs:
 
       # 🔼 Menyimpan last_id.json sebagai artifact setelah skrip berjalan
       - name: Save last_id.json
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: last_id
           path: last_id.json
