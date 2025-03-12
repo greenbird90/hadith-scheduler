@@ -30,11 +30,23 @@ jobs:
           name: last_id
         continue-on-error: true  # Menghindari error jika artifact belum pernah dibuat
 
+      # 🔍 Debug: Periksa apakah last_id.json berhasil dipulihkan
+      - name: Debug last_id.json sebelum menjalankan script
+        run: |
+          echo "Isi last_id.json sebelum dijalankan:"
+          cat last_id.json || echo "last_id.json tidak ditemukan"
+
       - name: Run script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
+
+      # 🔍 Debug: Periksa apakah last_id.json diperbarui setelah script berjalan
+      - name: Debug last_id.json setelah script
+        run: |
+          echo "Isi last_id.json setelah dijalankan:"
+          cat last_id.json || echo "last_id.json tidak ditemukan setelah script"
 
       # 🔼 Menyimpan last_id.json sebagai artifact setelah skrip berjalan
       - name: Save last_id.json
