@@ -5,61 +5,53 @@ on:
     - cron: "30 5 * * *"   # 12:30 WIB
     - cron: "0 11 * * *"   # 18:00 WIB
     - cron: "21 21 * * *"  # 04:00 WIB
-  workflow_dispatch:  # Bisa dijalankan secara manual dari GitHub Actions
+  workflow_dispatch:  # Bisa dijalankan manual dari GitHub Actions
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Checkout repository dengan persist-credentials: false
-      - name: Checkout repository
+      - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false  # Mencegah cache menghapus perubahan file
 
-      # ✅ Setup Python
-      - name: Setup Python
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # ✅ Install dependencies
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: pip install requests
 
-      # 🔽 Mengunduh last_id.json dari artifacts sebelumnya (jika ada)
-      - name: Restore last_id.json
+      # 🔹 Mengunduh last_id.json dari artifacts sebelumnya (jika ada)
+      - name: 🔄 Restore last_id.json
         uses: actions/download-artifact@v4
         with:
           name: last_id
-        continue-on-error: true  # Menghindari error jika artifact belum pernah dibuat
+        continue-on-error: true  # ✅ Lanjutkan meskipun file tidak ditemukan
 
-      # 🔍 Debug sebelum script berjalan
-      - name: Debug last_id.json sebelum script berjalan
+      - name: 🧐 Debug last_id.json sebelum script
         run: |
-          echo "📂 Isi direktori sebelum menjalankan script:"
+          echo "📂 Isi direktori sebelum script:"
           ls -la
           echo "📜 Isi last_id.json sebelum script:"
           cat last_id.json || echo "⚠️ last_id.json tidak ditemukan!"
 
-      # ✅ Menjalankan script utama
-      - name: Run script
+      - name: 🚀 Jalankan script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
 
-      # 🔍 Debug setelah script berjalan
-      - name: Debug last_id.json setelah script berjalan
+      - name: 🧐 Debug last_id.json setelah script
         run: |
-          echo "📂 Isi direktori setelah menjalankan script:"
+          echo "📂 Isi direktori setelah script:"
           ls -la
-          echo "📜 Isi last_id.json setelah script dijalankan:"
-          cat last_id.json || echo "⚠️ last_id.json tidak ditemukan setelah script!"
+          echo "📜 Isi last_id.json setelah script:"
+          cat last_id.json || echo "⚠️ last_id.json tidak ditemukan!"
 
-      # ✅ Simpan last_id.json agar bisa digunakan di run berikutnya
-      - name: Save last_id.json
+      # 🔹 Simpan last_id.json ke artifacts agar bisa digunakan di run berikutnya
+      - name: 💾 Save last_id.json
         uses: actions/upload-artifact@v4
         with:
           name: last_id
