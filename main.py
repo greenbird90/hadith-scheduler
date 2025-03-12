@@ -2,29 +2,12 @@ import requests
 import os
 import json
 
-# Fungsi untuk mengirim pesan ke Telegram
-def send_to_telegram(message, bot_token, chat_id):
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML"
-    }
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
-        print("Pesan berhasil dikirim ke Telegram.")
-    else:
-        print(f"Error mengirim pesan ke Telegram: {response.status_code}, {response.text}")
-
-# Fungsi untuk mengambil daftar buku dari API
-def get_books():
-    url = "https://api.hadith.gading.dev/books"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json().get("data", [])
-    else:
-        print(f"Error: Tidak dapat mengambil daftar buku. Status: {response.status_code}")
-        return []
+# Fungsi untuk menyimpan last_id.json dengan debug
+def save_last_id(current_book, last_id):
+    data = {"current_book": current_book, "last_id": last_id}
+    print(f"🔥 Menyimpan last_id.json dengan data: {data}")  # 🔍 Debugging
+    with open("last_id.json", "w") as file:
+        json.dump(data, file)
 
 # Fungsi untuk mengambil dan menampilkan hadits
 def get_hadith():
@@ -48,6 +31,7 @@ def get_hadith():
                 last_data = json.load(file)
                 current_book = last_data.get("current_book", current_book)
                 last_id = last_data.get("last_id", 1)
+            print(f"📂 last_id.json ditemukan: {last_data}")  # 🔍 Debugging
         except json.JSONDecodeError:
             print("Error membaca file last_id.json, reset ke default.")
 
@@ -85,12 +69,10 @@ def get_hadith():
             current_book = books[next_index]["id"]
             last_id = 1
 
-        with open("last_id.json", "w") as file:
-            json.dump({"current_book": current_book, "last_id": last_id}, file)
+        save_last_id(current_book, last_id)  # 🔥 Gunakan fungsi debug di sini
     else:
         print(f"Error: {response.status_code}, reset ke awal.")
-        with open("last_id.json", "w") as file:
-            json.dump({"current_book": books[0]["id"], "last_id": 1}, file)
+        save_last_id(books[0]["id"], 1)
 
 if __name__ == "__main__":
     get_hadith()
