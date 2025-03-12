@@ -27,7 +27,7 @@ jobs:
       - name: 🔄 Restore last_id.json
         uses: actions/download-artifact@v4
         with:
-          name: last_id
+          name: last_id.json
         continue-on-error: true  # ✅ Lanjutkan meskipun file tidak ditemukan
 
       - name: 🧐 Debug last_id.json sebelum script
@@ -50,5 +50,5 @@ jobs:
       - name: 💾 Save last_id.json
         uses: actions/upload-artifact@v4
         with:
-          name: last_id
+          name: last_id.json
           path: last_id.json
