@@ -32,8 +32,6 @@ jobs:
 
       - name: 🧐 Debug last_id.json sebelum script
         run: |
-          echo "📂 Isi direktori sebelum script:"
-          ls -la
           echo "📜 Isi last_id.json sebelum script:"
           cat last_id.json || echo "⚠️ last_id.json tidak ditemukan!"
 
@@ -45,8 +43,6 @@ jobs:
 
       - name: 🧐 Debug last_id.json setelah script
         run: |
-          echo "📂 Isi direktori setelah script:"
-          ls -la
           echo "📜 Isi last_id.json setelah script:"
           cat last_id.json || echo "⚠️ last_id.json tidak ditemukan!"
 

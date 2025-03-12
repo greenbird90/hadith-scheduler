@@ -40,8 +40,9 @@ def get_hadith():
         print("❌ Daftar buku tidak ditemukan. Program dihentikan.")
         return
 
-    # 🔹 Jika file tidak ada, buat default
+    # 🔹 Cek apakah file last_id.json ada, jika tidak buat default
     if not os.path.exists("last_id.json"):
+        print("⚠️ last_id.json tidak ditemukan! Membuat file baru.")
         with open("last_id.json", "w") as file:
             json.dump({"current_book": books[0]["id"], "last_id": 1}, file)
 
@@ -54,6 +55,8 @@ def get_hadith():
     except (json.JSONDecodeError, FileNotFoundError):
         print("❌ Error membaca last_id.json, reset ke default.")
         current_book, last_id = books[0]["id"], 1
+
+    print(f"📌 Kitab saat ini: {current_book}, Hadits terakhir: {last_id}")
 
     book_info = next((book for book in books if book["id"] == current_book), None)
     if not book_info:
@@ -91,6 +94,8 @@ def get_hadith():
         # 🔹 Simpan last_id.json
         with open("last_id.json", "w") as file:
             json.dump({"current_book": current_book, "last_id": last_id}, file)
+        print(f"✅ last_id.json diperbarui: {current_book}, Hadits ke-{last_id}")
+
     else:
         print(f"❌ Error API: {response.status_code}, reset ke awal.")
         with open("last_id.json", "w") as file:
