@@ -1,7 +1,7 @@
 # Hadith Telegram Bot
 
 ## 📌 Deskripsi
-Bot ini secara otomatis mengirimkan hadits harian ke grup atau channel Telegram berdasarkan koleksi hadits dari API [Hadith Gading](https://api.hadith.gading.dev). Bot akan menyimpan riwayat hadits yang telah dikirim dan melanjutkan dari hadits terakhir setiap kali dijalankan. berikut adalah channel telegram kami (**REMINDER HADIST HARIAN**: [https://t.me/dailyhadistrm](#)), silahkan join dan sebarkan untuk kaum muslimin
+Bot ini secara otomatis mengirimkan hadits harian ke grup atau channel Telegram berdasarkan koleksi hadits dari API [Hadith Gading](https://api.hadith.gading.dev). Bot akan menyimpan riwayat hadits yang telah dikirim dan melanjutkan dari hadits terakhir setiap kali dijalankan. berikut adalah channel telegram kami [REMINDER HADIST HARIAN](https://t.me/dailyhadistrm), silahkan join dan sebarkan untuk kaum muslimin
 
 ## 🚀 Fitur
 - 📖 Mengambil hadits dari berbagai kitab
