@@ -2,6 +2,13 @@ import requests
 import os
 import json
 
+"""
+Copyright © 2025 SARIPUDIN SAHARDI (saripudinsahardi@gmail.com)
+This code is licensed under the MIT License.
+You are free to use, modify, and distribute this code with proper attribution.
+For more details, visit: https://opensource.org/licenses/MIT
+"""
+
 # Fungsi untuk mengirim pesan ke Telegram
 def send_to_telegram(message, bot_token, chat_id):
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
