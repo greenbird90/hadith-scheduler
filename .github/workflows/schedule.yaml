@@ -5,7 +5,7 @@ on:
     - cron: "30 5 * * *"   # 12:30 WIB
     - cron: "0 11 * * *"   # 18:00 WIB
     - cron: "21 21 * * *"  # 04:00 WIB
-  workflow_dispatch:  # Bisa dijalankan manual dari GitHub Actions
+  workflow_dispatch:
 
 jobs:
   run-script:
@@ -21,34 +21,14 @@ jobs:
           python-version: '3.x'
 
       - name: 📦 Install dependencies
-        run: pip install requests
-
-      # 🔹 Mengunduh last_id.json dari artifacts sebelumnya (jika ada)
-      - name: 🔄 Restore last_id.json
-        uses: actions/download-artifact@v4
-        with:
-          name: last_id  # Sesuai dengan yang di-upload
-
-
-      - name: 🧐 Debug last_id.json sebelum script
         run: |
-          echo "📜 Isi last_id.json sebelum script:"
-          cat last_id.json || echo "⚠️ last_id.json tidak ditemukan!"
+          pip install requests gspread oauth2client python-dotenv
+
+      - name: 🔐 Decode GOOGLE_CREDS_BASE64 to credentials.json
+        run: echo "${{ secrets.GOOGLE_CREDS_BASE64 }}" | base64 -d > credentials.json
 
       - name: 🚀 Jalankan script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python main.py
-
-      - name: 🧐 Debug last_id.json setelah script
-        run: |
-          echo "📜 Isi last_id.json setelah script:"
-          cat last_id.json || echo "⚠️ last_id.json tidak ditemukan!"
-
-      # 🔹 Simpan last_id.json ke artifacts agar bisa digunakan di run berikutnya
-      - name: 💾 Save last_id.json
-        uses: actions/upload-artifact@v4
-        with:
-          name: last_id  # Gunakan nama tanpa ekstensi
-          path: last_id.json

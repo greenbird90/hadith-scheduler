@@ -1,15 +1,41 @@
 import requests
 import os
 import json
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from dotenv import load_dotenv
 
-"""
-Copyright © 2025 SARIPUDIN SAHARDI (saripudinsahardi@gmail.com)
-This code is licensed under the MIT License.
-You are free to use, modify, and distribute this code with proper attribution.
-For more details, visit: https://opensource.org/licenses/MIT
-"""
+load_dotenv()  # Load .env if running locally
 
-# Fungsi untuk mengirim pesan ke Telegram
+# ===🔹 Setup Google Sheets Access ===
+def get_gsheet_client():
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive"
+    ]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    client = gspread.authorize(creds)
+    return client
+
+# ===🔹 Baca last_id dari Google Sheet ===
+def read_last_id(sheet):
+    try:
+        data = sheet.get_all_records()
+        if data:
+            return data[0].get("current_book"), int(data[0].get("last_id"))
+    except Exception as e:
+        print(f"❌ Gagal membaca Google Sheet: {e}")
+    return None, 1
+
+# ===🔹 Simpan last_id ke Google Sheet ===
+def write_last_id(sheet, current_book, last_id):
+    try:
+        sheet.update('A2', [[current_book, last_id]])
+        print(f"✅ Google Sheet diperbarui: {current_book}, Hadits ke-{last_id}")
+    except Exception as e:
+        print(f"❌ Gagal menyimpan ke Google Sheet: {e}")
+
+# ===🔹 Kirim pesan ke Telegram ===
 def send_to_telegram(message, bot_token, chat_id):
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {
@@ -21,92 +47,80 @@ def send_to_telegram(message, bot_token, chat_id):
     if response.status_code == 200:
         print("✅ Pesan berhasil dikirim ke Telegram.")
     else:
-        print(f"❌ Error mengirim pesan ke Telegram: {response.status_code}, {response.text}")
+        print(f"❌ Error kirim ke Telegram: {response.status_code}, {response.text}")
 
-# Fungsi untuk mengambil daftar buku dari API
+# ===🔹 Ambil daftar kitab dari API ===
 def get_books():
     url = "https://api.hadith.gading.dev/books"
     response = requests.get(url)
     if response.status_code == 200:
         return response.json().get("data", [])
     else:
-        print(f"❌ Error: Tidak dapat mengambil daftar buku. Status: {response.status_code}")
+        print(f"❌ Gagal ambil daftar kitab. Status: {response.status_code}")
         return []
 
-# Fungsi utama untuk mengambil dan mengirim hadits
+# ===🔹 Fungsi utama ===
 def get_hadith():
     BOT_TOKEN = os.getenv("BOT_TOKEN")
     CHAT_ID = os.getenv("CHAT_ID")
 
     if not BOT_TOKEN or not CHAT_ID:
-        print("❌ BOT_TOKEN atau CHAT_ID tidak ditemukan. Pastikan sudah diatur di environment variables.")
+        print("❌ BOT_TOKEN atau CHAT_ID belum diset di environment.")
         return
 
     books = get_books()
     if not books:
-        print("❌ Daftar buku tidak ditemukan. Program dihentikan.")
         return
 
-    # 🔹 Cek apakah file last_id.json ada, jika tidak buat default
-    if not os.path.exists("last_id.json"):
-        print("⚠️ last_id.json tidak ditemukan! Membuat file baru.")
-        with open("last_id.json", "w") as file:
-            json.dump({"current_book": books[0]["id"], "last_id": 1}, file)
+    # 🔹 Akses Google Sheet
+    client = get_gsheet_client()
+    sheet = client.open("HadithData").sheet1
 
-    # 🔹 Membaca data terakhir dari file
-    try:
-        with open("last_id.json", "r") as file:
-            last_data = json.load(file)
-            current_book = last_data.get("current_book", books[0]["id"])
-            last_id = last_data.get("last_id", 1)
-    except (json.JSONDecodeError, FileNotFoundError):
-        print("❌ Error membaca last_id.json, reset ke default.")
-        current_book, last_id = books[0]["id"], 1
+    # 🔹 Baca dari Google Sheet
+    current_book, last_id = read_last_id(sheet)
+    if not current_book:
+        current_book = books[0]["id"]
+        last_id = 1
+        write_last_id(sheet, current_book, last_id)
 
-    print(f"📌 Kitab saat ini: {current_book}, Hadits terakhir: {last_id}")
+    print(f"📌 Kitab: {current_book}, Hadits ke-{last_id}")
 
-    book_info = next((book for book in books if book["id"] == current_book), None)
-    if not book_info:
-        book_info = books[0]
-        current_book, last_id = book_info["id"], 1
-
+    # 🔹 Ambil hadits dari API
     url = f"https://api.hadith.gading.dev/books/{current_book}/{last_id}"
     response = requests.get(url)
 
     if response.status_code == 200:
         data = response.json()
         if data.get("data"):
+            hadith = data["data"]["contents"]
             message = f"""
 <b>📖 Hadits Hari Ini</b>
 <b>📚 Kitab:</b> {data["data"]["name"]}
-<b>🔢 Nomor Hadits:</b> {data["data"]["contents"]["number"]}
+<b>🔢 Nomor Hadits:</b> {hadith["number"]}
 
 <b>🕌 Bahasa Arab:</b>
-{data["data"]["contents"]["arab"]}
+{hadith["arab"]}
 
 <b>📜 Terjemahan:</b>
-{data["data"]["contents"]["id"]}
+{hadith["id"]}
 
-<b>🤲 Support kami dengan sebarkan hadits & channel ini.</b>
+<b>🤲 Dukung & sebarkan channel ini.</b>
 """
             send_to_telegram(message, BOT_TOKEN, CHAT_ID)
 
-        # 🔹 Update last_id & cek apakah perlu pindah kitab
+        # 🔹 Update indeks hadits
+        book_info = next((b for b in books if b["id"] == current_book), books[0])
         last_id += 1
         if last_id > book_info["available"]:
             current_index = books.index(book_info)
-            next_index = (current_index + 1) % len(books)
-            current_book, last_id = books[next_index]["id"], 1
+            current_book = books[(current_index + 1) % len(books)]["id"]
+            last_id = 1
 
-        # 🔹 Simpan last_id.json
-        with open("last_id.json", "w") as file:
-            json.dump({"current_book": current_book, "last_id": last_id}, file)
-        print(f"✅ last_id.json diperbarui: {current_book}, Hadits ke-{last_id}")
-
+        write_last_id(sheet, current_book, last_id)
     else:
-        print(f"❌ Error API: {response.status_code}, reset ke awal.")
-        with open("last_id.json", "w") as file:
-            json.dump({"current_book": books[0]["id"], "last_id": 1}, file)
+        print(f"❌ API Error: {response.status_code}")
+        write_last_id(sheet, books[0]["id"], 1)
 
+# ===🔹 Eksekusi utama ===
 if __name__ == "__main__":
     get_hadith()
