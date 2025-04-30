@@ -49,9 +49,7 @@ MIT License - Hak cipta (c) 2025 SARIPUDIN SAHARDI
 Pull request sangat diterima! Jika Anda menemukan bug atau ingin menambahkan fitur baru, silakan buat issue atau kirim PR.
 
 ## 💰 Donasi
-Jika Anda ingin mendukung proyek ini, silakan berdonasi melalui e-wallet berikut:
-- **BCA**: 4731953001 a/n Saripudin
-- **BSI**: 7139446927 a/n Saripudin
+Jika Anda ingin mendukung proyek ini, silakan berdonasi melalui e-wallet berikut: https://www.paypal.me/green81rd
 
 ## 📬 Kontak
 Untuk pertanyaan atau saran, hubungi saya di [saripudinsahardi@gmail.com](mailto:saripudinsahardi@gmail.com).
